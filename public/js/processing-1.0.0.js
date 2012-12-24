@@ -16,8 +16,6 @@
 
  */
 
-alert('hi');
-
 (function() {
 
   var undef; // intentionally left undefined
