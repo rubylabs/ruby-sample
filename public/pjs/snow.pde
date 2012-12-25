@@ -1,19 +1,19 @@
-// All Examples Written by Casey Reas and Ben Fry
-// unless otherwise stated.
-
+/* @pjs preload="../image/london-1-mask.png, ../image/london-1-preview.png"; */
 
 final int NUMBEROFBOIDS = 1000;
 final float INITIALACCL = .15;
 final float AIRFRICTION = .001;
 final ini EMITATONCE = 2;
+PImage maskImage;
 
 Flock flock;
 
 void setup() {
 
+
   size(800,800);
   colorMode(RGB,255,255,255,100);
-
+  maskImage = loadImage("../image/london-1-preview.png");
   flock = new Flock();
   // Add an initial set of boids into the system
   //for (int i = 0; i < 100; i++) {
@@ -24,7 +24,9 @@ void setup() {
 
 void draw() {
   background(0);
+  image(maskImage, 0, 0);
   flock.run();
+
 }
 
 
@@ -94,6 +96,7 @@ class Boid {
     //flock(boids);
     update();
     borders();
+    hit();
     render();
   }
 
@@ -136,6 +139,10 @@ class Boid {
 
   }
 
+  void hit(){
+
+  //println(loc.x,loc.y);
+}
 
 
   void seek(Vector3D target) {
@@ -180,24 +187,24 @@ class Boid {
 
  
   void render() {
-
-    // Draw a triangle rotated in the direction of velocity
-   // float theta = vel.heading2D() + radians(90);
     fill(thecolor);
-   // stroke(thecolor);
+    stroke(thecolor);
 	ellipse(loc.x, loc.y, r, r);
-  //  pushMatrix();
-   // translate(loc.x,loc.y);
 
-   /* rotate(theta);
+  // Draw a triangle rotated in the direction of velocity
+  /* 
+    float theta = vel.heading2D() + radians(90);
+    pushMatrix();
+     translate(loc.x,loc.y);
+
+    rotate(theta);
     beginShape(TRIANGLES);
     vertex(0, -r*2);
     vertex(-r, r*2);
     vertex(r, r*2);
-    endShape(); */
-
-
-  //  popMatrix();
+    endShape(); 
+    popMatrix();
+  */
 
   }
 
