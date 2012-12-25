@@ -10,9 +10,9 @@ void setup() {
 
   flock = new Flock();
   // Add an initial set of boids into the system
-  for (int i = 0; i < 100; i++) {
-    flock.addBoid(new Boid(new Vector3D(random(20,width-20),20),2.0f,0.05f,color(128,128,128)));
-  }
+  //for (int i = 0; i < 100; i++) {
+  //  flock.addBoid(new Boid(new Vector3D(random(20,width-20),20),2.0f,0.05f,color(128,128,128)));
+  //}
   smooth();
 }
 
@@ -24,7 +24,7 @@ void draw() {
 
 // Add a new boid into the System
 void mousePressed() {
-  flock.addBoid(new Boid(new Vector3D(mouseX,mouseY),2.0f,0.05f,color(255,255,255)));
+  //flock.addBoid(new Boid(new Vector3D(mouseX,mouseY),2.0f,0.05f,color(255,255,255)));
 }
 
 
@@ -37,9 +37,11 @@ class Flock {
   }
 
   void run() {
+	if (boids.size()<100) addBoid(new Boid(new Vector3D(random(20,width-20),20),2.0f,0.05f,color(128,128,128)));
     for (int i = 0; i < boids.size(); i++) {
       Boid b = (Boid) boids.get(i);  
-      b.run(boids);  // Passing the entire list of boids to each boid individually
+      if (b.loc.y>400) removeBoid(b);
+      b.fall(boids);  // Passing the entire list of boids to each boid individually
     }
   }
 
@@ -62,7 +64,7 @@ class Boid {
   float maxspeed;    // Maximum speed
 
   Boid(Vector3D l, float ms, float mf, color c) {
-    acc = new Vector3D(0,0);
+    acc = new Vector3D(.5,0);
     // vel = new Vector3D(random(-1,1),random(-1,1));
     vel = new Vector3D(0,1);
     loc = l.copy();
@@ -72,8 +74,8 @@ class Boid {
     maxforce = mf;
   }
 
-  void run(ArrayList boids) {
-    flock(boids);
+  void fall(ArrayList boids) {
+    //flock(boids);
     update();
     borders();
     render();
