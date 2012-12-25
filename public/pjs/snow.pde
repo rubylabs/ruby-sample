@@ -84,7 +84,7 @@ class Boid {
     swingmag = random(2,5);
 	swinginc = random(.01,.05);
     loc = l.copy();
-    r = 2.0f;
+    r = random(.5,8);
     thecolor = c;
     maxspeed = ms;
     maxforce = mf;
@@ -182,18 +182,22 @@ class Boid {
   void render() {
 
     // Draw a triangle rotated in the direction of velocity
-    float theta = vel.heading2D() + radians(90);
+   // float theta = vel.heading2D() + radians(90);
     fill(thecolor);
-    stroke(thecolor);
-    pushMatrix();
-    translate(loc.x,loc.y);
-    rotate(theta);
+   // stroke(thecolor);
+	ellipse(loc.x, loc.y, r, r);
+  //  pushMatrix();
+   // translate(loc.x,loc.y);
+
+   /* rotate(theta);
     beginShape(TRIANGLES);
     vertex(0, -r*2);
     vertex(-r, r*2);
     vertex(r, r*2);
-    endShape();
-    popMatrix();
+    endShape(); */
+
+
+  //  popMatrix();
 
   }
 
