@@ -46,6 +46,10 @@ class Flock {
   void addBoid(Boid b) {
     boids.add(b);
   }
+
+  void removeBoid(Boid b) {
+    boids.remove(b);
+  }
 }
 
 class Boid {
@@ -179,7 +183,7 @@ class Boid {
     if (loc.x < -r) loc.x = width+r;
     if (loc.y < -r) loc.y = height+r;
     if (loc.x > width+r) loc.x = -r;
-    if (loc.y > height+r) loc.y = -r;
+   // if (loc.y > height+r) loc.y = -r;
   }
 
 
