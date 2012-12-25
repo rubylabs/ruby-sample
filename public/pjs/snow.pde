@@ -3,70 +3,63 @@
 final int NUMBEROFBOIDS = 1000;
 final float INITIALACCL = .15;
 final float AIRFRICTION = .001;
-final ini EMITATONCE = 2;
+final ini EMITATONCE = 10;
 PImage maskImage;
 
-Flock flock;
+Storm storm;
 
 void setup() {
-
-
   size(800,800);
   colorMode(RGB,255,255,255,100);
   maskImage = loadImage("../image/london-1-preview.png");
-  flock = new Flock();
-  // Add an initial set of boids into the system
-  //for (int i = 0; i < 100; i++) {
-  //  flock.addBoid(new Boid(new Vector3D(random(20,width-20),20),2.0f,0.05f,color(128,128,128)));
-  //}
+  storm = new Storm();
   smooth();
 }
 
 void draw() {
   background(0);
   image(maskImage, 0, 0);
-  flock.run();
-
+  loadPixels();
+  storm.run();
 }
 
-
-// Add a new boid into the System
 void mousePressed() {
-  //flock.addBoid(new Boid(new Vector3D(mouseX,mouseY),2.0f,0.05f,color(255,255,255)));
 }
 
 
 
-class Flock {
-  ArrayList boids; // An arraylist for all the boids
+class Storm {
+  ArrayList flakes; // An arraylist for all the boids
 
-  Flock() {
-    boids = new ArrayList(); // Initialize the arraylist
+  Storm() {
+    flakes = new ArrayList(); // Initialize the arraylist
   }
 
   void run() {
-	if (boids.size()<NUMBEROFBOIDS) {
+	if (flakes.size()<NUMBEROFBOIDS) {
 		for (init i = 0; i < EMITATONCE; i++) {
-			addBoid(new Boid(new Vector3D(random(20,width-20),20),2.0f,0.05f,color(128,128,128)));
+			addFlake(new Flake(new Vector3D(random(20,width-20),20),2.0f,0.05f,color(random(180,230))));
 		}
 	}
-    for (int i = 0; i < boids.size(); i++) {
-      Boid b = (Boid) boids.get(i);  
-      if (b.loc.y>height) removeBoid(b);
-      b.fall(boids);  // Passing the entire list of boids to each boid individually
+    for (int i = 0; i < flakes.size(); i++) {
+      Flake b = (Flake) flakes.get(i);  
+      if (b.loc.y>height) removeFlake(b);
+      if (!b.alive) removeFlake(b);
+
+      b.fall(flakes);  // Passing the entire list of boids to each boid individually
     }
   }
 
-  void addBoid(Boid b) {
-    boids.add(b);
+  void addFlake(Flake b) {
+    flakes.add(b);
   }
 
-  void removeBoid(Boid b) {
-    boids.remove(b);
+  void removeFlake(Flake b) {
+    flakes.remove(b);
   }
 }
 
-class Boid {
+class Flake {
   float swing;
   float swingmag;
   float swinginc;
@@ -77,233 +70,67 @@ class Boid {
   color thecolor;
   float maxforce;    // Maximum steering force
   float maxspeed;    // Maximum speed
-
-  Boid(Vector3D l, float ms, float mf, color c) {
-    acc = new Vector3D(0,INITIALACCL);
-    // vel = new Vector3D(random(-1,1),random(-1,1));
-    vel = new Vector3D(0,1);
-    swing = 0;
-    swingmag = random(2,5);
-	swinginc = random(.01,.05);
-    loc = l.copy();
-    r = random(.5,8);
-    thecolor = c;
-    maxspeed = ms;
-    maxforce = mf;
-  }
-
-  void fall(ArrayList boids) {
-    //flock(boids);
-    update();
-    borders();
-    hit();
-    render();
-  }
-
-  // We accumulate a new acceleration each time based on three rules
-
-  void flock(ArrayList boids) {
-    Vector3D sep = separate(boids);   // Separation
-    Vector3D ali = align(boids);      // Alignment
-    Vector3D coh = cohesion(boids);   // Cohesion
-
-    // Arbitrarily weight these forces
-    sep.mult(2.0f);
-    ali.mult(1.0f);
-    coh.mult(1.0f);
-
-    // Add the force vectors to acceleration
-    acc.add(sep);
-    acc.add(ali);
-    acc.add(coh);
-
-  }
-
-  
-
-  // Method to update location
-
-  void update() {
-    // Update velocity
-    vel.add(acc);
-
-    // Limit speed
-    // vel.limit(maxspeed);
-     loc.add(vel);
-
-    // Reset acceleration to 0 each cycle
-    acc.y=acc.y-AIRFRICTION;
-    vel.x=cos(swing)*swingmag;
-    swing=swing+swinginc;
-	//if (swing>2) swing=-2;
-
-  }
-
-  void hit(){
-
-  //println(loc.x,loc.y);
-}
+  boolean alive = true;
 
 
-  void seek(Vector3D target) {
-    acc.add(steer(target,false));
-  }
+      // Initialize
+		Flake(Vector3D l, float ms, float mf, color c) {
+		    acc = new Vector3D(0,INITIALACCL);
+		    vel = new Vector3D(0,1);
+		    swing = 0;
+		    swingmag = random(2,5);
+			swinginc = random(.01,.05);
+		    loc = l.copy();
+		    r = random(.5,8);
+		    thecolor = c;
+		    maxspeed = ms;
+		    maxforce = mf;
+		  }
+		
+        // Iterate
+		  void fall(ArrayList boids) {
+		    update();
+		    borders();
+		    render();
+		    hit();
+		  }
 
 
-  void arrive(Vector3D target) {
-    acc.add(steer(target,true));
-  }
+		 // Method to update location
+		  void update() {
+		    // Update velocity
+		    vel.add(acc);
+		    loc.add(vel);
 
+		    // Reset acceleration to 0 each cycle
+		    acc.y=acc.y-AIRFRICTION;
+		    vel.x=cos(swing)*swingmag;
+		    swing=swing+swinginc;
+		  }
 
-  // A method that calculates a steering vector towards a target
-  // Takes a second argument, if true, it slows down as it approaches the target
+		// did we hit the city
+		  void hit(){
+		    int tempIndex = 800*int(loc.y)+ int(loc.x);
+		    float a = red(pixels[tempIndex]);
+			if (a>200) {
+		    	alive = false;
+		     }
+		  }
 
-  Vector3D steer(Vector3D target, boolean slowdown) {
-    Vector3D steer;  // The steering vector
-    Vector3D desired = target.sub(target,loc);  // A vector pointing from the location to the target
-    float d = desired.magnitude(); // Distance from the target is the magnitude of the vector
-
-    // If the distance is greater than 0, calc steering (otherwise return zero vector)
-    if (d > 0) {
-
-      // Normalize desired
-      desired.normalize();
-
-      // Two options for desired vector magnitude (1 -- based on distance, 2 -- maxspeed)
-      if ((slowdown) && (d < 100.0f)) desired.mult(maxspeed*(d/100.0f)); // This damping is somewhat arbitrary
-      else desired.mult(maxspeed);
-
-      // Steering = Desired minus Velocity
-      steer = target.sub(desired,vel);
-      steer.limit(maxforce);  // Limit to maximum steering force
-
-    } else {
-
-      steer = new Vector3D(0,0);
-
-    }
-    return steer;
-  }
-
+		// draw the flake 
+		  void render() {
+		    fill(thecolor);
+		    stroke(thecolor);
+			ellipse(loc.x, loc.y, r, r);
+		  }
  
-  void render() {
-    fill(thecolor);
-    stroke(thecolor);
-	ellipse(loc.x, loc.y, r, r);
-
-  // Draw a triangle rotated in the direction of velocity
-  /* 
-    float theta = vel.heading2D() + radians(90);
-    pushMatrix();
-     translate(loc.x,loc.y);
-
-    rotate(theta);
-    beginShape(TRIANGLES);
-    vertex(0, -r*2);
-    vertex(-r, r*2);
-    vertex(r, r*2);
-    endShape(); 
-    popMatrix();
-  */
-
-  }
-
-  
-
-  // Wraparound
-  void borders() {
-    if (loc.x < -r) loc.x = width+r;
-    if (loc.y < -r) loc.y = height+r;
-    if (loc.x > width+r) loc.x = -r;
-   // if (loc.y > height+r) loc.y = -r;
-  }
-
-
-
-  // Separation
-
-  // Method checks for nearby boids and steers away
-
-  Vector3D separate (ArrayList boids) {
-    float desiredseparation = 25.0f;
-    Vector3D sum = new Vector3D(0,0,0);
-    int count = 0;
-
-    // For every boid in the system, check if it's too close
-    for (int i = 0 ; i < boids.size(); i++) {
-      Boid other = (Boid) boids.get(i);
-      float d = loc.distance(loc,other.loc);
-
-      // If the distance is greater than 0 and less than an arbitrary amount (0 when you are yourself)
-      if ((d > 0) && (d < desiredseparation)) {
-        // Calculate vector pointing away from neighbor
-
-        Vector3D diff = loc.sub(loc,other.loc);
-        diff.normalize();
-        diff.div(d);        // Weight by distance
-        sum.add(diff);
-        count++;            // Keep track of how many
-      }
-    }
-
-    // Average -- divide by how many
-    if (count > 0) {
-      sum.div((float)count);
-    }
-    return sum;
-  }
-
-  
-
-  // Alignment
-
-  // For every nearby boid in the system, calculate the average velocity
-
-  Vector3D align (ArrayList boids) {
-    float neighbordist = 50.0f;
-    Vector3D sum = new Vector3D(0,0,0);
-    int count = 0;
-    for (int i = 0 ; i < boids.size(); i++) {
-      Boid other = (Boid) boids.get(i);
-      float d = loc.distance(loc,other.loc);
-      if ((d > 0) && (d < neighbordist)) {
-        sum.add(other.vel);
-        count++;
-      }
-    }
-
-    if (count > 0) {
-      sum.div((float)count);
-      sum.limit(maxforce);
-    }
-    return sum;
-  }
-
-
-
-  // Cohesion
-
-  // For the average location (i.e. center) of all nearby boids, calculate steering vector towards that location
-
-  Vector3D cohesion (ArrayList boids) {
-    float neighbordist = 50.0f;
-    Vector3D sum = new Vector3D(0,0,0);   // Start with empty vector to accumulate all locations
-    int count = 0;
-    for (int i = 0 ; i < boids.size(); i++) {
-      Boid other = (Boid) boids.get(i);
-      float d = loc.distance(loc,other.loc);
-      if ((d > 0) && (d < neighbordist)) {
-        sum.add(other.loc); // Add location
-        count++;
-      }
-    }
-
-    if (count > 0) {
-      sum.div((float)count);
-      return steer(sum,false);  // Steer towards the location
-    }
-    return sum;
-  }
+		 // Wraparound
+		  void borders() {
+		    if (loc.x < -r) loc.x = width+r;
+		    if (loc.y < -r) loc.y = height+r;
+		    if (loc.x > width+r) loc.x = -r;
+		   // if (loc.y > height+r) loc.y = -r;
+		  }
 }
 
 // Simple Vector3D Class 
