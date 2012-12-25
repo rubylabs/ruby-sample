@@ -38,7 +38,7 @@ class Storm {
   void run() {
 	if (flakes.size()<NUMBEROFBOIDS) {
 		for (init i = 0; i < EMITATONCE; i++) {
-			addFlake(new Flake(new Vector3D(random(20,width-20),20),2.0f,0.05f,color(random(180,230))));
+			addFlake(new Flake(new Vector3D(random(20,width-20),20),2.0f,0.05f,color(random(128,200))));
 		}
 	}
     for (int i = 0; i < flakes.size(); i++) {
