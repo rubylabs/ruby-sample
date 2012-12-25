@@ -1,6 +1,12 @@
 // All Examples Written by Casey Reas and Ben Fry
 // unless otherwise stated.
 
+
+final int NUMBEROFBOIDS = 1000;
+final float INITIALACCL = .15;
+final float AIRFRICTION = .001;
+final ini EMITATONCE = 2;
+
 Flock flock;
 
 void setup() {
@@ -37,10 +43,14 @@ class Flock {
   }
 
   void run() {
-	if (boids.size()<100) addBoid(new Boid(new Vector3D(random(20,width-20),20),2.0f,0.05f,color(128,128,128)));
+	if (boids.size()<NUMBEROFBOIDS) {
+		for (init i = 0; i < EMITATONCE; i++) {
+			addBoid(new Boid(new Vector3D(random(20,width-20),20),2.0f,0.05f,color(128,128,128)));
+		}
+	}
     for (int i = 0; i < boids.size(); i++) {
       Boid b = (Boid) boids.get(i);  
-      if (b.loc.y>400) removeBoid(b);
+      if (b.loc.y>height) removeBoid(b);
       b.fall(boids);  // Passing the entire list of boids to each boid individually
     }
   }
@@ -55,6 +65,9 @@ class Flock {
 }
 
 class Boid {
+  float swing;
+  float swingmag;
+  float swinginc;
   Vector3D loc;
   Vector3D vel;
   Vector3D acc;
@@ -64,9 +77,12 @@ class Boid {
   float maxspeed;    // Maximum speed
 
   Boid(Vector3D l, float ms, float mf, color c) {
-    acc = new Vector3D(.5,0);
+    acc = new Vector3D(0,INITIALACCL);
     // vel = new Vector3D(random(-1,1),random(-1,1));
     vel = new Vector3D(0,1);
+    swing = 0;
+    swingmag = random(2,5);
+	swinginc = random(.01,.05);
     loc = l.copy();
     r = 2.0f;
     thecolor = c;
@@ -109,11 +125,14 @@ class Boid {
     vel.add(acc);
 
     // Limit speed
-    vel.limit(maxspeed);
-    loc.add(vel);
+    // vel.limit(maxspeed);
+     loc.add(vel);
 
     // Reset acceleration to 0 each cycle
-    acc.setXYZ(0,0,0);
+    acc.y=acc.y-AIRFRICTION;
+    vel.x=cos(swing)*swingmag;
+    swing=swing+swinginc;
+	//if (swing>2) swing=-2;
 
   }
 
