@@ -1,9 +1,9 @@
 /* @pjs preload="../image/london-1-mask.png, ../image/london-1-preview.png"; */
 
-final int NUMBEROFBOIDS = 1000;
-final float INITIALACCL = .15;
-final float AIRFRICTION = .001;
-final ini EMITATONCE = 10;
+final int NUMBEROFBOIDS = 500;
+final float INITIALACCL = .08;
+final float AIRFRICTION = .0002;
+final ini EMITATONCE = 5;
 PImage maskImage;
 
 Storm storm;
@@ -81,7 +81,7 @@ class Flake {
 		    swingmag = random(2,5);
 			swinginc = random(.01,.05);
 		    loc = l.copy();
-		    r = random(.5,8);
+		    r = random(.5,6);
 		    thecolor = c;
 		    maxspeed = ms;
 		    maxforce = mf;
