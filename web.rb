@@ -7,9 +7,6 @@ end
 
 
 get '/' do
-  "Hello, world 6"
+  /html/snow.html
 end
 
-get '/hi' do
-  "Hello World!"
-end
