@@ -1,10 +1,11 @@
 /* @pjs preload="../image/london-1-mask.png, ../image/london-1-preview.png"; */
 
 final int NUMBEROFBOIDS = 500;
-final float INITIALACCL = .08;
-final float AIRFRICTION = .0002;
-final ini EMITATONCE = 5;
-
+final float INITIALACCL = .05;
+final float AIRFRICTION = 0;
+final int EMITATONCE = 4;
+final int MAXPILES = 5000;
+final int ONEIN = 5;
 
 Storm storm;
 City city;
@@ -28,6 +29,8 @@ void draw() {
 }
 
 void mousePressed() {
+   city = new City();
+   storm = new Storm(city.getPixels());
 }
 
 class City {
@@ -40,16 +43,14 @@ class City {
       pilings = new ArrayList();
       hitpoint = new PVector();
 
-
 	  hitpoint.x=200;
 	  hitpoint.y=200;
 
 	  pilings.add(hitpoint); 
-
   }
   
 
-  color[] getPixels(){
+ color[] getPixels(){
     color[] thePixels;
     maskImage.loadPixels();
     thePixels=maskImage.pixels;
@@ -58,19 +59,14 @@ class City {
 
 
   void run(ArrayList pile){
-      PVector pv;
-
-     // image(maskImage, 0, 0);
-
-     // ellipse(pilings.get(0).x, pilings.get(0).x, 5, 5);
-
-     for (i=0; i<pile.size() ; i++){
-            pv = pile.get(i);
-      	    fill(128);
-		    stroke(128);
-			ellipse (pv.x, pv.y, random (.1,4),random (.1,4));
-		} 
-   }
+    	 PVector pv;
+	     for (i=0; i<pile.size() ; i++){
+	            pv = pile.get(i);
+	      	    fill(255,128);
+			    noStroke();
+				ellipse (pv.x, pv.y, random (.1,4),random (.1,4));
+		 } 
+      }
 }
 
 class Storm {
@@ -78,14 +74,10 @@ class Storm {
   ArrayList thePile;
   color[] theCity;
   int pileCount=5;
-
-
-    Storm(color[] cityPixels) {
-    flakes = new ArrayList();
-    thePile = new ArrayList();
-    theCity = cityPixels;
-   
-
+  Storm(color[] cityPixels) {
+  flakes = new ArrayList();
+  thePile = new ArrayList();
+  theCity = cityPixels;
   }
 
   void run() {
@@ -103,6 +95,7 @@ class Storm {
       theSpot = new PVector (b.loc.x, b.loc.y);
 
       if (b.loc.y>height) removeFlake(b);
+
       if (red(theCity[int(b.loc.y)*800+int(b.loc.x)])>200) {
            removeFlake(b);
            addToPile(theSpot);
@@ -116,7 +109,9 @@ class Storm {
    } 
 
   void addToPile(PVector p) {
-    if (thePile.size()<10000) thePile.add(p);
+    p.y=p.y+random(-2,2);
+    if (thePile.size()<MAXPILES) 
+      if (random(1,ONEIN)>ONEIN-1) thePile.add(p);
   }
 
   void addFlake(Flake b) {
@@ -144,8 +139,8 @@ class Flake {
 
       // Initialize
 		Flake(Vector3D l, float ms, float mf, color c) {
-		    acc = new Vector3D(0,INITIALACCL);
-		    vel = new Vector3D(0,.5);
+		    acc = new Vector3D(0,random(INITIALACCL/2,INITIALACCL));
+		    vel = new Vector3D(0,random(.1,.5));
 		    swing = 0;
 		    swingmag = random(2,5);
 			swinginc = random(.01,.05);
