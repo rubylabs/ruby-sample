@@ -4,50 +4,119 @@ final int NUMBEROFBOIDS = 500;
 final float INITIALACCL = .08;
 final float AIRFRICTION = .0002;
 final ini EMITATONCE = 5;
-PImage maskImage;
+
 
 Storm storm;
+City city;
 
 void setup() {
   size(800,800);
   colorMode(RGB,255,255,255,100);
-  maskImage = loadImage("../image/london-1-preview.png");
-  storm = new Storm();
+
+  city = new City();
+  storm = new Storm(city.getPixels());
+  
   smooth();
 }
 
 void draw() {
   background(0);
-  image(maskImage, 0, 0);
-  loadPixels();
+  city.run(storm.getPile());
   storm.run();
+
+
 }
 
 void mousePressed() {
 }
 
+class City {
+  PImage maskImage;
+  ArrayList pilings;
 
+  City(){
+      PVector hitpoint;
+      maskImage = loadImage("../image/london-1-preview.png"); 
+      pilings = new ArrayList();
+      hitpoint = new PVector();
+
+
+	  hitpoint.x=200;
+	  hitpoint.y=200;
+
+	  pilings.add(hitpoint); 
+
+  }
+  
+
+  color[] getPixels(){
+    color[] thePixels;
+    maskImage.loadPixels();
+    thePixels=maskImage.pixels;
+    return thePixels;
+  }
+
+
+  void run(ArrayList pile){
+      PVector pv;
+
+     // image(maskImage, 0, 0);
+
+     // ellipse(pilings.get(0).x, pilings.get(0).x, 5, 5);
+
+     for (i=0; i<pile.size() ; i++){
+            pv = pile.get(i);
+      	    fill(128);
+		    stroke(128);
+			ellipse (pv.x, pv.y, random (.1,4),random (.1,4));
+		} 
+   }
+}
 
 class Storm {
-  ArrayList flakes; // An arraylist for all the boids
+  ArrayList flakes;
+  ArrayList thePile;
+  color[] theCity;
+  int pileCount=5;
 
-  Storm() {
-    flakes = new ArrayList(); // Initialize the arraylist
+
+    Storm(color[] cityPixels) {
+    flakes = new ArrayList();
+    thePile = new ArrayList();
+    theCity = cityPixels;
+   
+
   }
 
   void run() {
+    PVector theSpot;
+   
 	if (flakes.size()<NUMBEROFBOIDS) {
 		for (init i = 0; i < EMITATONCE; i++) {
 			addFlake(new Flake(new Vector3D(random(20,width-20),20),2.0f,0.05f,color(random(128,200))));
 		}
 	}
+	
     for (int i = 0; i < flakes.size(); i++) {
-      Flake b = (Flake) flakes.get(i);  
-      if (b.loc.y>height) removeFlake(b);
-      if (!b.alive) removeFlake(b);
 
-      b.fall(flakes);  // Passing the entire list of boids to each boid individually
+      Flake b = (Flake) flakes.get(i);  
+      theSpot = new PVector (b.loc.x, b.loc.y);
+
+      if (b.loc.y>height) removeFlake(b);
+      if (red(theCity[int(b.loc.y)*800+int(b.loc.x)])>200) {
+           removeFlake(b);
+           addToPile(theSpot);
+      }
+      b.fall();     
     }
+  }
+
+  ArrayList getPile(){
+      return thePile;
+   } 
+
+  void addToPile(PVector p) {
+    if (thePile.size()<10000) thePile.add(p);
   }
 
   void addFlake(Flake b) {
@@ -76,7 +145,7 @@ class Flake {
       // Initialize
 		Flake(Vector3D l, float ms, float mf, color c) {
 		    acc = new Vector3D(0,INITIALACCL);
-		    vel = new Vector3D(0,1);
+		    vel = new Vector3D(0,.5);
 		    swing = 0;
 		    swingmag = random(2,5);
 			swinginc = random(.01,.05);
@@ -88,11 +157,11 @@ class Flake {
 		  }
 		
         // Iterate
-		  void fall(ArrayList boids) {
+		  //void fall(ArrayList boids) {
+		  void fall() {
 		    update();
 		    borders();
 		    render();
-		    hit();
 		  }
 
 
@@ -108,14 +177,7 @@ class Flake {
 		    swing=swing+swinginc;
 		  }
 
-		// did we hit the city
-		  void hit(){
-		    int tempIndex = 800*int(loc.y)+ int(loc.x);
-		    float a = red(pixels[tempIndex]);
-			if (a>200) {
-		    	alive = false;
-		     }
-		  }
+
 
 		// draw the flake 
 		  void render() {
