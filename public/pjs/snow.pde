@@ -13,7 +13,7 @@ City city;
 void setup() {
   size(800,800);
   colorMode(RGB,255,255,255,100);
-
+  frameRate(25);
   city = new City();
   storm = new Storm(city.getPixels());
   
@@ -62,10 +62,13 @@ class City {
     	 PVector pv;
 	     for (i=0; i<pile.size() ; i++){
 	            pv = pile.get(i);
-	      	    fill(255,128);
+	      	    fill(200,180);
 			    noStroke();
-				ellipse (pv.x, pv.y, random (.1,4),random (.1,4));
+				ellipse (pv.x, pv.y, random (1,4),random (1,4));
 		 } 
+		 
+		     fill(min(128,128*(pile.size()/1000)),255);
+		     text("London", 400, 700);
       }
 }
 
@@ -109,7 +112,8 @@ class Storm {
    } 
 
   void addToPile(PVector p) {
-    p.y=p.y+random(-2,2);
+    p.y+=random(-2,2);
+    p.x+=random(-2,2);
     if (thePile.size()<MAXPILES) 
       if (random(1,ONEIN)>ONEIN-1) thePile.add(p);
   }
@@ -145,7 +149,7 @@ class Flake {
 		    swingmag = random(2,5);
 			swinginc = random(.01,.05);
 		    loc = l.copy();
-		    r = random(.5,6);
+		    r = random(.5,4);
 		    thecolor = c;
 		    maxspeed = ms;
 		    maxforce = mf;
