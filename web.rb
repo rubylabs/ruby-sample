@@ -7,6 +7,6 @@ end
 
 
 get '/' do
-  /html/snow.html
+  "/html/snow.html"
 end
 
