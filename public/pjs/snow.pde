@@ -1,4 +1,4 @@
-/* @pjs preload="../image/london-1-mask.png, ../image/london-1-preview.png"; */
+/* @pjs preload="../image/london-1-mask.png, ../image/golden-gate-mask.png, ../image/new-york-mask.png"; */
 
 final int NUMBEROFBOIDS = 500;
 final float INITIALACCL = .05;
@@ -6,6 +6,9 @@ final float AIRFRICTION = 0;
 final int EMITATONCE = 4;
 final int MAXPILES = 5000;
 final int ONEIN = 5;
+final int MAXCITY = 3;
+
+int selectCity=1;
 
 Storm storm;
 City city;
@@ -29,6 +32,8 @@ void draw() {
 }
 
 void mousePressed() {
+   selectCity++;
+   if (selectCity>MAXCITY) selectCity=1;
    city = new City();
    storm = new Storm(city.getPixels());
 }
@@ -39,7 +44,9 @@ class City {
 
   City(){
       PVector hitpoint;
-      maskImage = loadImage("../image/london-1-preview.png"); 
+      if (selectCity==1) maskImage = loadImage("../image/london-1-mask.png"); 
+      if (selectCity==2) maskImage = loadImage("../image/golden-gate-mask.png"); 
+      if (selectCity==3) maskImage = loadImage("../image/new-york-mask.png"); 
       pilings = new ArrayList();
       hitpoint = new PVector();
 
@@ -68,7 +75,10 @@ class City {
 		 } 
 		 
 		     fill(min(128,128*(pile.size()/1000)),255);
-		     text("London", 400, 700);
+		
+		     if (selectCity==1) text("London", 400, 770);
+		     if (selectCity==2) text("San Francisco", 400, 770);
+		     if (selectCity==3) text("New York", 400, 770);
       }
 }
 
