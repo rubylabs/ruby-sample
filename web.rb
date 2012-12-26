@@ -7,6 +7,6 @@ end
 
 
 get '/' do
-  "/html/snow.html"
+  redirect "/html/snow.html"
 end
 
