@@ -19,7 +19,6 @@ void setup() {
   frameRate(25);
   city = new City();
   storm = new Storm(city.getPixels());
-  
   smooth();
 }
 
@@ -27,8 +26,6 @@ void draw() {
   background(0);
   city.run(storm.getPile());
   storm.run();
-
-
 }
 
 void mousePressed() {
@@ -43,17 +40,9 @@ class City {
   ArrayList pilings;
 
   City(){
-      PVector hitpoint;
       if (selectCity==1) maskImage = loadImage("../image/london-1-mask.png"); 
       if (selectCity==2) maskImage = loadImage("../image/golden-gate-mask.png"); 
       if (selectCity==3) maskImage = loadImage("../image/new-york-mask.png"); 
-      pilings = new ArrayList();
-      hitpoint = new PVector();
-
-	  hitpoint.x=200;
-	  hitpoint.y=200;
-
-	  pilings.add(hitpoint); 
   }
   
 
@@ -75,7 +64,6 @@ class City {
 		 } 
 		 
 		     fill(min(128,128*(pile.size()/1000)),255);
-		
 		     if (selectCity==1) text("London", 400, 770);
 		     if (selectCity==2) text("San Francisco", 400, 770);
 		     if (selectCity==3) text("New York", 400, 770);
@@ -154,15 +142,14 @@ class Flake {
       // Initialize
 		Flake(Vector3D l, float ms, float mf, color c) {
 		    acc = new Vector3D(0,random(INITIALACCL/2,INITIALACCL));
-		    vel = new Vector3D(0,random(.1,.5));
+		    vel = new Vector3D(random(-.5,.5),random(0,1));
 		    swing = 0;
-		    swingmag = random(2,5);
-			swinginc = random(.01,.05);
+		    swingmag = random(1,2);
+			swinginc = random(.0,.05);
 		    loc = l.copy();
 		    r = random(.5,4);
 		    thecolor = c;
-		    maxspeed = ms;
-		    maxforce = mf;
+
 		  }
 		
         // Iterate
